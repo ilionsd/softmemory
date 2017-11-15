@@ -7,9 +7,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
-public class FileSystemMemory<K, V extends Serializable> implements Memory<K, V> {
-    private long capacityL;
-    private long sizeL;
+public class FileSystemMemory<K, V extends Serializable> extends AbstractMemory<K, V> {
     private Path storagePath;
     private ConcurrentMap<Object, String> keyFileNameMap;
 
@@ -17,7 +15,7 @@ public class FileSystemMemory<K, V extends Serializable> implements Memory<K, V>
         Path file;
         if (keyFileNameMap.containsKey(key))
             file = storagePath.resolve(keyFileNameMap.get(key));
-        else {
+        else synchronized (this){
             file = FileCreator.makeTempOrDie(storagePath, "", "");
             keyFileNameMap.put(key, file.toFile().getName());
         }
@@ -36,7 +34,9 @@ public class FileSystemMemory<K, V extends Serializable> implements Memory<K, V>
 
     protected void write(Path file, Object o) {
         try (ObjectOutputStream os = new ObjectOutputStream( Files.newOutputStream(file, StandardOpenOption.WRITE) )) {
-            os.writeObject(o);
+            synchronized (this) {
+                os.writeObject(o);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e.getCause());
         }
@@ -48,23 +48,6 @@ public class FileSystemMemory<K, V extends Serializable> implements Memory<K, V>
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e.getCause());
         }
-    }
-
-    @Override
-    public long capacityL() {
-        return capacityL;
-    }
-
-    @Override
-    public long sizeL() {
-        return sizeL;
-    }
-
-    @Override
-    public int size() {
-        if (Long.compare(Integer.MAX_VALUE, sizeL) < 0)
-            return Integer.MAX_VALUE;
-        return (int)sizeL;
     }
 
     @Override
@@ -95,25 +78,23 @@ public class FileSystemMemory<K, V extends Serializable> implements Memory<K, V>
 
     @Override
     public V put(K key, V value) {
+        if (!containsKey(key))
+            incrementSizeL();
         Path file = getFileByKey(key);
         write(file, value);
         return value;
     }
 
     @Override
-    public synchronized V remove(Object key) {
+    public V remove(Object key) {
         Path file = getFileByKey(key);
         V value = (V)read(file);
-        keyFileNameMap.remove(key);
-        delete(file);
-        return value;
-    }
-
-    @Override
-    public void putAll(Map<? extends K, ? extends V> m) {
-        for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
-            put(entry.getKey(), entry.getValue());
+        synchronized (this) {
+            keyFileNameMap.remove(key);
+            delete(file);
         }
+        decrementSizeL();
+        return value;
     }
 
     @Override

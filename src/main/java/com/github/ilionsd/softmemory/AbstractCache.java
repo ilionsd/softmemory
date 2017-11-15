@@ -1,18 +1,23 @@
 package com.github.ilionsd.softmemory;
 
 import java.io.Serializable;
-import java.util.Optional;
 
 public abstract class AbstractCache<K, V extends Serializable> implements Cache<K, V> {
-    private Optional<Memory<K, V>> maybeCache = Optional.empty();
+    private Memory<K, V> memory;
+    private DiscardPolicy<K> discardPolicy;
 
     @Override
-    public void setCache(Memory<K, V> memory) {
-        maybeCache = Optional.of(memory);
+    public Memory<K, V> getMemory() {
+        return memory;
     }
 
     @Override
-    public Optional<Memory<K, V>> getCache() {
-        return maybeCache;
+    public DiscardPolicy<K> getDiscardPolicy() {
+        return discardPolicy;
+    }
+
+    @Override
+    public void setDiscardPolicy(DiscardPolicy<K> discardPolicy) {
+        this.discardPolicy = discardPolicy;
     }
 }

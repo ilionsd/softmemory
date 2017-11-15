@@ -27,7 +27,7 @@ public class FileSystemMemory<K, V extends Serializable> extends AbstractMemory<
         try (ObjectInputStream is = new ObjectInputStream( Files.newInputStream(file, StandardOpenOption.READ) )) {
             o = is.readObject();
         } catch (ClassNotFoundException | IOException e) {
-            throw new RuntimeException(e.getMessage(), e.getCause());
+            //throw new RuntimeException(e.getMessage(), e.getCause());
         }
         return o;
     }
@@ -51,69 +51,30 @@ public class FileSystemMemory<K, V extends Serializable> extends AbstractMemory<
     }
 
     @Override
-    public boolean isEmpty() {
-        return keyFileNameMap.isEmpty();
-    }
-
-    @Override
-    public boolean containsKey(Object key) {
-        return keyFileNameMap.containsKey(key);
-    }
-
-    /**
-     * to-do Later
-     * @param value
-     * @return
-     */
-    @Override
-    public boolean containsValue(Object value) {
-        return false;
-    }
-
-    @Override
-    public V get(Object key) {
+    public Optional<V> load(Object key) {
         Path file = getFileByKey(key);
-        return (V)read(file);
+        return Optional.ofNullable( (V)read(file) );
     }
 
     @Override
-    public V put(K key, V value) {
-        if (!containsKey(key))
+    public void store(K key, V value) {
+        if (!keyFileNameMap.containsKey(key))
             incrementSizeL();
         Path file = getFileByKey(key);
         write(file, value);
-        return value;
     }
 
     @Override
-    public V remove(Object key) {
+    public Optional<V> discard(Object key) {
         Path file = getFileByKey(key);
-        V value = (V)read(file);
-        synchronized (this) {
-            keyFileNameMap.remove(key);
-            delete(file);
+        Optional<V> value = Optional.ofNullable( (V)read(file) );
+        if (value.isPresent()) {
+            synchronized (this) {
+                keyFileNameMap.remove(key);
+                delete(file);
+            }
+            decrementSizeL();
         }
-        decrementSizeL();
         return value;
-    }
-
-    @Override
-    public void clear() {
-
-    }
-
-    @Override
-    public Set<K> keySet() {
-        return null;
-    }
-
-    @Override
-    public Collection<V> values() {
-        return null;
-    }
-
-    @Override
-    public Set<Entry<K, V>> entrySet() {
-        return null;
     }
 }

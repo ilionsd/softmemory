@@ -2,63 +2,31 @@ package com.github.ilionsd.softmemory;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 public class RandomAccessMemory<K, V extends Serializable> extends AbstractMemory<K, V> {
     private ConcurrentMap<K, V> map;
 
+
     @Override
-    public boolean isEmpty() {
-        return map.isEmpty();
+    public Optional<V> load(Object key) {
+        return Optional.ofNullable(map.get(key));
     }
 
     @Override
-    public boolean containsKey(Object key) {
-        return map.containsKey(key);
-    }
-
-    @Override
-    public boolean containsValue(Object value) {
-        return false;
-    }
-
-    @Override
-    public V get(Object key) {
-        return map.get(key);
-    }
-
-    @Override
-    public V put(K key, V value) {
-        if (!containsKey(key))
+    public void store(K key, V value) {
+        if (!map.containsKey(key))
             incrementSizeL();
-        return map.put(key, value);
+        map.put(key, value);
     }
 
     @Override
-    public V remove(Object key) {
-        V value = map.remove(key);
-        decrementSizeL();
+    public Optional<V> discard(Object key) {
+        Optional<V> value = Optional.ofNullable(map.remove(key));
+        if (value.isPresent())
+            decrementSizeL();
         return value;
-    }
-
-    @Override
-    public void clear() {
-
-    }
-
-    @Override
-    public Set<K> keySet() {
-        return null;
-    }
-
-    @Override
-    public Collection<V> values() {
-        return null;
-    }
-
-    @Override
-    public Set<Entry<K, V>> entrySet() {
-        return null;
     }
 }

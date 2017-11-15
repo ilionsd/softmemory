@@ -4,39 +4,42 @@ import java.io.Serializable;
 import java.util.Optional;
 
 public interface Cache<K, V extends Serializable> extends Memory<K, V> {
-    void setCache(Memory<K, V> memory);
-    Optional<Memory<K, V>> getCache();
     Memory<K, V> getMemory();
+    DiscardPolicy<K> getDiscardPolicy();
+    void setDiscardPolicy(DiscardPolicy<K> discardPolicy);
 
     @Override
-    default long capacityL() {
-        return getMemory().capacityL();
+    default long capacity() {
+        return getMemory().capacity();
     }
 
     @Override
-    default long sizeL() {
-        return getMemory().sizeL();
+    default long size() {
+        return getMemory().size();
     }
 
     @Override
-    default boolean isEmpty() {
-        return getMemory().isEmpty();
+    default Optional<V> load(K key) {
+        getDiscardPolicy().used(key);
+        return getMemory().load(key);
     }
 
     @Override
-    default boolean containsKey(Object key) {
-        return getMemory().containsKey(key);
+    default void store(K key, V value) {
+        if (getMemory().isFull()) synchronized (this) {
+            getMemory().discard(getDiscardPolicy().discardKey());
+        }
+        getDiscardPolicy().used(key);
+        getMemory().store(key, value);
     }
 
     @Override
-    default boolean containsValue(Object value) {
-        return getMemory().containsValue(value);
-    }
-
-    @Override
-    default V get(Object key) {
-        return getCache()
-                .flatMap( memory -> Optional.ofNullable(memory.get(key)) )
-                .orElseGet( () -> getMemory().get(key) );
+    default Optional<V> discard(K key) {
+        Optional<V> oValue;
+        synchronized (this) {
+            getDiscardPolicy().discard(key);
+            oValue = getMemory().discard(key);
+        }
+        return oValue;
     }
 }

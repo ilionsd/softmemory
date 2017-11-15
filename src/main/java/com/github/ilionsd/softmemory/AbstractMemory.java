@@ -4,27 +4,27 @@ import java.io.Serializable;
 import java.util.Optional;
 
 public abstract class AbstractMemory<K, V extends Serializable> implements Memory<K, V> {
-    private long capacityL;
-    private long sizeL;
+    private long capacity;
+    private long size;
 
     @Override
-    public long capacityL() {
-        return capacityL;
+    public long capacity() {
+        return capacity;
     }
 
     @Override
-    public long sizeL() {
-        return sizeL;
+    public long size() {
+        return size;
     }
 
     protected synchronized void incrementSizeL() {
         if (isFull())
             throw new OutOfMemoryError("Size of used memory reached capacity and cant be enlarged!");
         else
-            ++sizeL;
+            ++size;
     }
 
     protected synchronized void decrementSizeL() {
-        --sizeL;
+        --size;
     }
 }

@@ -23,7 +23,7 @@ public class RandomAccessMemory<K, V extends Serializable> extends AbstractMemor
     }
 
     @Override
-    public Optional<V> discard(Object key) {
+    public Optional<V> remove(Object key) {
         Optional<V> value = Optional.ofNullable(map.remove(key));
         if (value.isPresent())
             decrementSizeL();

@@ -22,7 +22,7 @@ public interface Memory<K, V extends Serializable> {
 
     Optional<V> load(K key);
     void store(K key, V value);
-    Optional<V> discard(K key);
+    Optional<V> remove(K key);
 
     default void storeAll(Map<? extends K, ? extends V> m) {
         for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {

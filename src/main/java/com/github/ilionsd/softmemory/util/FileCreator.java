@@ -1,4 +1,4 @@
-package com.github.ilionsd.softmemory;
+package com.github.ilionsd.softmemory.util;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,44 +1,35 @@
 package com.github.ilionsd.softmemory;
 
+import com.github.ilionsd.softmemory.replacementpolicy.ReplacementPolicy;
+
 import java.io.Serializable;
 import java.util.Optional;
 
-public interface Cache<K, V extends Serializable> extends Memory<K, V> {
+public interface Cache<K, V extends Serializable> {
     Memory<K, V> getMemory();
-    DiscardPolicy<K> getDiscardPolicy();
-    void setDiscardPolicy(DiscardPolicy<K> discardPolicy);
+    ReplacementPolicy<K> getReplacementPolicy();
+    void setReplacementPolicy(ReplacementPolicy<K> replacementPolicy);
 
-    @Override
-    default long capacity() {
-        return getMemory().capacity();
-    }
-
-    @Override
-    default long size() {
-        return getMemory().size();
-    }
-
-    @Override
-    default Optional<V> load(K key) {
-        getDiscardPolicy().used(key);
+    default Optional<V> tryLoad(K key) {
+        getReplacementPolicy().used(key);
         return getMemory().load(key);
     }
 
-    @Override
-    default void store(K key, V value) {
+    default void keep(K key, V value) {
         if (getMemory().isFull()) synchronized (this) {
-            getMemory().discard(getDiscardPolicy().discardKey());
+            K replaceKey = getReplacementPolicy().replaceKey();
+            getMemory().remove(replaceKey);
+            getReplacementPolicy().discard(replaceKey);
         }
-        getDiscardPolicy().used(key);
+        getReplacementPolicy().used(key);
         getMemory().store(key, value);
     }
 
-    @Override
     default Optional<V> discard(K key) {
         Optional<V> oValue;
         synchronized (this) {
-            getDiscardPolicy().discard(key);
-            oValue = getMemory().discard(key);
+            getReplacementPolicy().discard(key);
+            oValue = getMemory().remove(key);
         }
         return oValue;
     }

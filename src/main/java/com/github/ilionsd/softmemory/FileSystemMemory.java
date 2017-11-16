@@ -1,5 +1,7 @@
 package com.github.ilionsd.softmemory;
 
+import com.github.ilionsd.softmemory.util.FileCreator;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,7 +67,7 @@ public class FileSystemMemory<K, V extends Serializable> extends AbstractMemory<
     }
 
     @Override
-    public Optional<V> discard(Object key) {
+    public Optional<V> remove(Object key) {
         Path file = getFileByKey(key);
         Optional<V> value = Optional.ofNullable( (V)read(file) );
         if (value.isPresent()) {

@@ -1,10 +1,12 @@
 package com.github.ilionsd.softmemory;
 
+import com.github.ilionsd.softmemory.replacementpolicy.ReplacementPolicy;
+
 import java.io.Serializable;
 
 public abstract class AbstractCache<K, V extends Serializable> implements Cache<K, V> {
     private Memory<K, V> memory;
-    private DiscardPolicy<K> discardPolicy;
+    private ReplacementPolicy<K> replacementPolicy;
 
     @Override
     public Memory<K, V> getMemory() {
@@ -12,12 +14,12 @@ public abstract class AbstractCache<K, V extends Serializable> implements Cache<
     }
 
     @Override
-    public DiscardPolicy<K> getDiscardPolicy() {
-        return discardPolicy;
+    public ReplacementPolicy<K> getReplacementPolicy() {
+        return replacementPolicy;
     }
 
     @Override
-    public void setDiscardPolicy(DiscardPolicy<K> discardPolicy) {
-        this.discardPolicy = discardPolicy;
+    public void setReplacementPolicy(ReplacementPolicy<K> replacementPolicy) {
+        this.replacementPolicy = replacementPolicy;
     }
 }

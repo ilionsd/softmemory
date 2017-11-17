@@ -5,7 +5,14 @@ import java.util.Optional;
 
 public abstract class AbstractMemory<K, V extends Serializable> implements Memory<K, V> {
     private long capacity;
-    private long size;
+    private long size = 0;
+
+    public AbstractMemory(long capacity) {
+        if (Long.compare(0, capacity) > 0)
+            this.capacity = 0;
+        else
+            this.capacity = capacity;
+    }
 
     @Override
     public long capacity() {

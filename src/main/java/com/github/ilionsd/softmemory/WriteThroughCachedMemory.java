@@ -2,6 +2,7 @@ package com.github.ilionsd.softmemory;
 
 import java.io.Serializable;
 import java.util.Optional;
+import java.util.Set;
 
 public class WriteThroughCachedMemory<K, V extends Serializable> extends AbstractCachedMemory<K, V> {
     protected Optional<V> cacheMiss(K key) {
@@ -17,13 +18,18 @@ public class WriteThroughCachedMemory<K, V extends Serializable> extends Abstrac
     }
 
     @Override
-    public void store(K key, V value) {
-        getMemory().store(key, value);
+    public Optional<V> store(K key, V value) {
+        return getMemory().store(key, value);
     }
 
     @Override
     public Optional<V> remove(K key) {
         getCache().discard(key);
         return getMemory().remove(key);
+    }
+
+    @Override
+    public Set<K> keySet() {
+        return getMemory().keySet();
     }
 }

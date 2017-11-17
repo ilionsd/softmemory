@@ -4,8 +4,13 @@ import java.io.Serializable;
 import java.util.Optional;
 
 public abstract class AbstractCachedMemory<K, V extends Serializable> implements CachedMemory<K, V> {
-    private Cache<K, V> cache;
     private Memory<K, V> memory;
+    private Cache<K, V> cache;
+
+    public AbstractCachedMemory(Memory<K, V> memory, Cache<K, V> cache) {
+        this.memory = memory;
+        this.cache = cache;
+    }
 
     @Override
     public void setCache(Cache<K, V> cache) {

@@ -17,10 +17,6 @@ public interface Memory<K, V extends Serializable> {
         return Long.compare(size(), capacity()) >= 0;
     }
 
-    default boolean isNotFull() {
-        return Long.compare(size(), capacity()) < 0;
-    }
-
     Optional<V> load(K key);
     Optional<V> store(K key, V value);
     Optional<V> remove(K key);

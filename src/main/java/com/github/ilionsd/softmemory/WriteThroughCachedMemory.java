@@ -5,6 +5,11 @@ import java.util.Optional;
 import java.util.Set;
 
 public class WriteThroughCachedMemory<K, V extends Serializable> extends AbstractCachedMemory<K, V> {
+
+    public WriteThroughCachedMemory(Memory<K, V> memory, Cache<K, V> cache) {
+        super(memory, cache);
+    }
+
     protected Optional<V> cacheMiss(K key) {
         Optional<V> oValue = getMemory().load(key);
         oValue.ifPresent(value -> getCache().keep(key, value));
@@ -19,6 +24,7 @@ public class WriteThroughCachedMemory<K, V extends Serializable> extends Abstrac
 
     @Override
     public Optional<V> store(K key, V value) {
+        getCache().keep(key, value);
         return getMemory().store(key, value);
     }
 

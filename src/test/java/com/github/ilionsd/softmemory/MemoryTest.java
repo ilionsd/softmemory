@@ -15,83 +15,34 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
-public class MemoryTest {
-    public static final long DEFAULT_CAPACITY = 10;
-
-    private static Set<Integer> indexSet;
-    private static Set<Integer> numberOfZerosSet;
-    private static Set<Integer> repeatDigitsSet;
-
-    private long memoryCapacity = 10;
-
-    private Map<Integer, Integer> initialData;
-    private Map<Integer, Integer> additionalData;
-
-    private Class<Memory<Integer, Integer>> clazz;
-    private Memory<Integer, Integer> memory;
-
-    public static <K, V> Map<K, V> toMap(Set<K> keys, Set<V> vals) {
-        Iterator<K> keysIt = keys.iterator();
-        Iterator<V> valsIt = vals.iterator();
-        Map<K, V> map = new HashMap<>();
-        while (keysIt.hasNext() && valsIt.hasNext())
-            map.put(keysIt.next(), valsIt.next());
-        return map;
-    }
+public class MemoryTest extends AbstractTest<Integer, Integer, Memory<Integer, Integer>> {
+    protected Memory<Integer, Integer> memory;
 
     @Parameterized.Parameters(name = "{index}: {0} with capacity {1}")
     public static Collection<Object[]> testCases() {
-        initialize();
         List<Object[]> list = new ArrayList<Object[]>();
         list.add( new Object[]{
                 RandomAccessMemory.class,
-                DEFAULT_CAPACITY,
-                toMap(indexSet, numberOfZerosSet),
-                toMap(repeatDigitsSet, repeatDigitsSet) });
+                Data.DEFAULT_CAPACITY,
+                Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
+                Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
         list.add( new Object[]{
                 FileSystemMemory.class,
-                DEFAULT_CAPACITY,
-                toMap(indexSet, numberOfZerosSet),
-                toMap(repeatDigitsSet, repeatDigitsSet) });
+                Data.DEFAULT_CAPACITY,
+                Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
+                Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
         return list;
     }
 
-    public MemoryTest(Class clazz,
+    public MemoryTest(Class<Memory<Integer, Integer>> clazz,
                       long memoryCapacity,
-                      Map<Integer, Integer> initialData,
-                      Map<Integer, Integer> additionalData) {
-        this.clazz = clazz;
-        this.memoryCapacity = memoryCapacity;
-        this.initialData = initialData;
-        this.additionalData = additionalData;
-    }
-
-    public static void initialize() {
-        indexSet = new HashSet<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
-        numberOfZerosSet = new HashSet<>(
-                Arrays.asList(
-                        1,
-                        10,
-                        100,
-                        1000,
-                        10000,
-                        100000,
-                        1000000));
-        repeatDigitsSet = new HashSet<>(
-                Arrays.asList(
-                        1111111,
-                        2222222,
-                        3333333,
-                        4444444,
-                        5555555,
-                        6666666,
-                        7777777,
-                        8888888,
-                        9999999));
+                      Map<Integer, Integer> iData,
+                      Map<Integer, Integer> aData) {
+        super(clazz, memoryCapacity, iData, aData);
     }
 
     @Before
-    public void memoryInit() {
+    public void init() {
         try {
             memory = clazz.getConstructor(long.class).newInstance(memoryCapacity);
         } catch (NoSuchMethodException
@@ -100,17 +51,31 @@ public class MemoryTest {
                 | InvocationTargetException e) {
             e.printStackTrace();
         }
-        memory.storeAll(initialData);
+        memory.storeAll(iData);
     }
 
     @Test
     public void size() {
-        assertEquals((long)initialData.size(), memory.size());
+        assertEquals((long)iData.size(), memory.size());
+    }
+
+    @Test(expected = OutOfMemoryError.class)
+    public void isFull() {
+        Iterator<Map.Entry<Integer, Integer>> iterator = aData.entrySet().iterator();
+        Map.Entry<Integer, Integer> entry;
+        while (!memory.isFull()) {
+            assertFalse(memory.isFull());
+            entry = iterator.next();
+            memory.store(entry.getKey(), entry.getValue());
+        }
+        assertTrue(memory.isFull());
+        entry = iterator.next();
+        memory.store(entry.getKey(), entry.getValue());
     }
 
     @Test
     public void load() {
-        for (Map.Entry<Integer, Integer> entry : initialData.entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : iData.entrySet()) {
             Optional<Integer> oValue = memory.load(entry.getKey());
             assertTrue("Workaround Optional<T> to compare with <T>",
                     oValue.map(value -> Integer.compare(value, entry.getValue()) == 0).orElse(false));
@@ -119,7 +84,7 @@ public class MemoryTest {
 
     @Test(expected = OutOfMemoryError.class)
     public void store() {
-        for (Map.Entry<Integer, Integer> entry : additionalData.entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : aData.entrySet()) {
             Optional<Integer> oValue;
 
             oValue = memory.store(entry.getKey(), entry.getValue());
@@ -134,7 +99,7 @@ public class MemoryTest {
 
     @Test
     public void remove() {
-        for (Map.Entry<Integer, Integer> entry : initialData.entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : iData.entrySet()) {
             Optional<Integer> oValue;
 
             oValue = memory.load(entry.getKey());

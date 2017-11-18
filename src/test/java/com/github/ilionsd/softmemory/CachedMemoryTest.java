@@ -12,6 +12,8 @@ import java.util.Map;
 
 @RunWith(Parameterized.class)
 public class CachedMemoryTest extends MemoryTest {
+    public static final long DEFAULT_CAPACITY = 14L;
+
     protected long bufferCapacity;
     protected Class<Memory<Integer, Integer>> bufferClazz;
     protected Class<Cache<Integer, Integer>> cacheClazz;
@@ -22,20 +24,56 @@ public class CachedMemoryTest extends MemoryTest {
         List<Object[]> list = new ArrayList<Object[]>();
         list.add( new Object[]{
                 WriteThroughCachedMemory.class,
-                RandomAccessMemory.class,
+                FileSystemMemory.class,
                 RandomCache.class,
                 RandomAccessMemory.class,
-                Data.DEFAULT_CAPACITY,
-                Data.DEFAULT_CAPACITY / 2,
+                DEFAULT_CAPACITY,
+                DEFAULT_CAPACITY / 2,
                 Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
                 Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
         list.add( new Object[]{
                 WriteThroughCachedMemory.class,
                 FileSystemMemory.class,
+                FIFOCache.class,
+                RandomAccessMemory.class,
+                DEFAULT_CAPACITY,
+                DEFAULT_CAPACITY / 2,
+                Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
+                Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
+        list.add( new Object[]{
+                WriteThroughCachedMemory.class,
+                FileSystemMemory.class,
+                LeastRecentlyUsedCache.class,
+                RandomAccessMemory.class,
+                DEFAULT_CAPACITY,
+                DEFAULT_CAPACITY / 2,
+                Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
+                Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
+        list.add( new Object[]{
+                WriteBackCachedMemory.class,
+                FileSystemMemory.class,
                 RandomCache.class,
                 RandomAccessMemory.class,
-                Data.DEFAULT_CAPACITY,
-                Data.DEFAULT_CAPACITY / 2,
+                DEFAULT_CAPACITY,
+                DEFAULT_CAPACITY / 2,
+                Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
+                Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
+        list.add( new Object[]{
+                WriteBackCachedMemory.class,
+                FileSystemMemory.class,
+                FIFOCache.class,
+                RandomAccessMemory.class,
+                DEFAULT_CAPACITY,
+                DEFAULT_CAPACITY / 2,
+                Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
+                Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
+        list.add( new Object[]{
+                WriteBackCachedMemory.class,
+                FileSystemMemory.class,
+                LeastRecentlyUsedCache.class,
+                RandomAccessMemory.class,
+                DEFAULT_CAPACITY,
+                DEFAULT_CAPACITY / 2,
                 Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
                 Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
         return list;

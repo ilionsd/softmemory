@@ -3,6 +3,7 @@ package com.github.ilionsd.softmemory;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -52,11 +53,6 @@ public class MemoryTest extends AbstractTest<Integer, Integer, Memory<Integer, I
             e.printStackTrace();
         }
         memory.storeAll(iData);
-    }
-
-    @Test
-    public void size() {
-        assertEquals((long)iData.size(), memory.size());
     }
 
     @Test(expected = OutOfMemoryError.class)
@@ -113,6 +109,22 @@ public class MemoryTest extends AbstractTest<Integer, Integer, Memory<Integer, I
             oValue = memory.load(entry.getKey());
             assertFalse("Workaround Optional<T> to compare with <T>",
                     oValue.isPresent());
+        }
+    }
+
+    @Test
+    public void replace() {
+        Map<Integer, Integer> rData = new HashMap<>();
+        Iterator<Integer> kIterator = iData.keySet().iterator();
+        Iterator<Integer> vIterator = aData.values().iterator();
+
+        while (kIterator.hasNext() && vIterator.hasNext())
+            rData.put(kIterator.next(), vIterator.next());
+
+        for (Map.Entry<Integer, Integer> entry : rData.entrySet()) {
+            Optional<Integer> oValue = memory.store(entry.getKey(), entry.getValue());
+            assertTrue(oValue.isPresent());
+            assertEquals(iData.get(entry.getKey()), oValue.get());
         }
     }
 }

@@ -12,6 +12,8 @@ public abstract class AbstractCachedMemory<K, V extends Serializable> implements
         this.cache = cache;
     }
 
+    protected abstract Optional<V> cacheMiss(K key);
+
     @Override
     public void setCache(Cache<K, V> cache) {
         this.cache = cache;

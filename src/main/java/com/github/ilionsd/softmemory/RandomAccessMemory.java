@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class RandomAccessMemory<K, V extends Serializable> extends AbstractMemory<K, V> {
+public final class RandomAccessMemory<K, V extends Serializable> extends AbstractMemory<K, V> {
     public static final long DEFAULT_CAPACITY = 100L;
 
     private ConcurrentMap<K, V> map;

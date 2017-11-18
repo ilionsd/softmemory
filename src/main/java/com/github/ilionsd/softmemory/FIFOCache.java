@@ -1,25 +1,20 @@
 package com.github.ilionsd.softmemory;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
 
-public class RandomCache<K, V extends Serializable> extends AbstractCache<K, V>  {
+public final class FIFOCache<K, V extends Serializable> extends AbstractCache<K, V> {
+    private Deque<K> deque = new LinkedList<>();
 
-    public RandomCache(Memory<K, V> buffer) {
+    public FIFOCache(Memory<K, V> buffer) {
         super(buffer);
     }
 
     @Override
     protected K replacementKey() {
-        long index = ThreadLocalRandom.current().nextLong(0L, getBuffer().size());
-        Iterator<K> iterator = getBuffer().keySet().iterator();
-        while (index-- != 0)
-            iterator.next();
-        return iterator.next();
+        return deque.element();
     }
 
     @Override
@@ -31,19 +26,23 @@ public class RandomCache<K, V extends Serializable> extends AbstractCache<K, V> 
     public Optional<Entry<K, V>> keep(K key, V value) {
         Optional<V> oValue = getBuffer().load(key);
         K replacementKey = null;
-        if (oValue.isPresent())
+        if (oValue.isPresent()) {
             replacementKey = key;
+            discard(key);
+        }
         else if (getBuffer().isFull()) {
             replacementKey = replacementKey();
             oValue = discard(replacementKey);
         }
         K replacedKey = replacementKey;
+        deque.add(key);
         getBuffer().store(key, value);
         return oValue.map(replacedValue -> new SimpleEntry<>(replacedKey, replacedValue));
     }
 
     @Override
     public Optional<V> discard(K key) {
+        deque.remove(key);
         return getBuffer().remove(key);
     }
 }

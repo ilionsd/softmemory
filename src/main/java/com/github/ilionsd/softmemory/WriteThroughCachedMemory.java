@@ -10,6 +10,7 @@ public class WriteThroughCachedMemory<K, V extends Serializable> extends Abstrac
         super(memory, cache);
     }
 
+    @Override
     protected Optional<V> cacheMiss(K key) {
         Optional<V> oValue = getMemory().load(key);
         oValue.ifPresent(value -> getCache().keep(key, value));

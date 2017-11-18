@@ -26,6 +26,18 @@ public class CacheTest extends AbstractTest<Integer, Integer, Cache<Integer, Int
                 Data.DEFAULT_CAPACITY,
                 Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
                 Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
+        list.add( new Object[]{
+                FIFOCache.class,
+                RandomAccessMemory.class,
+                Data.DEFAULT_CAPACITY,
+                Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
+                Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
+        list.add( new Object[]{
+                LeastRecentlyUsedCache.class,
+                RandomAccessMemory.class,
+                Data.DEFAULT_CAPACITY,
+                Data.toMap(Data.INDEX_SET, Data.NUMBER_OF_ZEROS_SET),
+                Data.toMap(Data.REPEAT_DIGIT_SET, Data.REPEAT_DIGIT_SET) });
         return list;
     }
 
@@ -78,15 +90,15 @@ public class CacheTest extends AbstractTest<Integer, Integer, Cache<Integer, Int
 
     @Test
     public void keep() {
-        Optional<Integer> oValue;
+        Optional<Map.Entry<Integer, Integer>> oEntry;
         Iterator<Map.Entry<Integer, Integer>> iterator = aData.entrySet().iterator();
         do {
             Map.Entry<Integer, Integer> entry = iterator.next();
-            oValue = cache.keep(entry.getKey(), entry.getValue());
-        } while (!oValue.isPresent());
+            oEntry = cache.keep(entry.getKey(), entry.getValue());
+        } while (!oEntry.isPresent());
         do {
             Map.Entry<Integer, Integer> entry = iterator.next();
-            oValue = cache.keep(entry.getKey(), entry.getValue());
+            oEntry = cache.keep(entry.getKey(), entry.getValue());
         } while (iterator.hasNext());
     }
 }

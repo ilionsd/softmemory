@@ -1,7 +1,6 @@
 package com.github.ilionsd.softmemory;
 
 import java.io.Serializable;
-import java.util.Optional;
 
 public abstract class AbstractMemory<K, V extends Serializable> implements Memory<K, V> {
     private long capacity;

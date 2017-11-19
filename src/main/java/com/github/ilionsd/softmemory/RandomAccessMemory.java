@@ -1,7 +1,6 @@
 package com.github.ilionsd.softmemory;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

@@ -7,7 +7,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RandomCache<K, V extends Serializable> extends AbstractCache<K, V>  {
+public final class RandomCache<K, V extends Serializable> extends AbstractCache<K, V>  {
 
     public RandomCache(Memory<K, V> buffer) {
         super(buffer);

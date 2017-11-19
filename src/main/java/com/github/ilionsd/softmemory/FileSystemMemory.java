@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class FileSystemMemory<K, V extends Serializable> extends AbstractMemory<K, V> {
+public final class FileSystemMemory<K, V extends Serializable> extends AbstractMemory<K, V> {
     public static final long DEFAULT_CAPACITY = 10000L;
 
     private Path storagePath;

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class WriteBackCachedMemory<K, V extends Serializable> extends AbstractCachedMemory<K, V> {
+public final class WriteBackCachedMemory<K, V extends Serializable> extends AbstractCachedMemory<K, V> {
 
     public WriteBackCachedMemory(Memory<K, V> memory, Cache<K, V> cache) {
         super(memory, cache);

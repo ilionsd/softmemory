@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 
-public class WriteThroughCachedMemory<K, V extends Serializable> extends AbstractCachedMemory<K, V> {
+public final class WriteThroughCachedMemory<K, V extends Serializable> extends AbstractCachedMemory<K, V> {
 
     public WriteThroughCachedMemory(Memory<K, V> memory, Cache<K, V> cache) {
         super(memory, cache);

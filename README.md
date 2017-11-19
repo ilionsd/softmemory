@@ -10,7 +10,7 @@ A complete statement of problem is
 ### My solution is based on 3 abstractions:
 * `Memory<K, V>` - simple associative container interface;
 * `Cache<K, V>` - cache replacement policies over `Memory<K, V>` buffer;
-* `CachedMemory<K, V>` - extended from `Memory<K, V>` cache writing policies over `Memory<K, V>` main memory and `Cahce<K, V>` buffer.
+* `CachedMemory<K, V>` - extended from `Memory<K, V>` cache writing policies over `Memory<K, V>` main memory and `Cache<K, V>` buffer.
 
 This approach makes possible to create any depth-level cache by using object of `CachedMemory` as buffer for `Cache`.
 Possible 3 level case is:
